@@ -16,7 +16,7 @@ function Hello() {
   }, []);
 
   return (
-    <div>
+    <div className="Window">
       <div className="Time">
         <h1>
           {String(date.getHours()).padStart(2, '0')}:
