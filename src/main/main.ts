@@ -12,6 +12,7 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+import Store from 'electron-store';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
@@ -71,8 +72,8 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 600,
+    height: 400,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
@@ -111,6 +112,18 @@ const createWindow = async () => {
   // eslint-disable-next-line
   new AppUpdater();
 };
+
+const StoreData = new Store({ name: 'data' });
+
+// getUser(data取得処理)
+ipcMain.handle('getUser', async () => {
+  return StoreData.get('User', []);
+});
+
+// getUser(data保存処理)
+ipcMain.handle('setU', async (event, data) => {
+  StoreData.set('User', data);
+});
 
 /**
  * Add event listeners...
