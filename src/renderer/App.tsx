@@ -9,22 +9,31 @@ type User = {
   name: string;
 };
 
+type Record = {
+  id: number;
+  user: User;
+  enterAt: Date;
+  exitAt: Date;
+};
+
 function Hello() {
   const [date, setDate] = useState(new Date());
-  const [isEnter, setIsEnter] = useState<boolean>(false);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [IsGetUser, setIsGetUser] = useState<boolean>(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentRecord, setCurrentRecord] = useState<Record | null>(null);
 
   const usersToOptions = (us: User[]) => {
     return us.map((u) => ({ value: u.id, label: u.name }));
   };
 
-  const getUser = async () => {
+  const getStoreData = async () => {
     try {
       const user = await window.electron.ipcRenderer.getUser();
       setCurrentUser(user);
       setIsGetUser(true);
+      const record = await window.electron.ipcRenderer.getRecord();
+      setCurrentRecord(record);
     } catch (error) {
       console.error(error);
     }
@@ -42,8 +51,52 @@ function Hello() {
     }
   };
 
+  const getLatestRecord = async (id: number) => {
+    try {
+      const res = await axios.post('http://localhost:4040/latest_record', {
+        user_id: id,
+      });
+      console.log(res.data);
+      setCurrentRecord(res.data.record);
+      await window.electron.ipcRenderer.setRecord(res.data.record);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const enter = async () => {
+    try {
+      if (!currentUser) {
+        return;
+      }
+      const res = await axios.post('http://localhost:4040/enter', {
+        user_id: currentUser.id,
+      });
+      console.log(res.data);
+      setCurrentRecord(res.data.record);
+      await window.electron.ipcRenderer.setRecord(res.data.record);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const exit = async () => {
+    try {
+      if (!currentUser) {
+        return;
+      }
+      await axios.put('http://localhost:4040/exit', {
+        user_id: currentUser.id,
+      });
+      setCurrentRecord(null);
+      await window.electron.ipcRenderer.setRecord(null);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
-    getUser();
+    getStoreData();
     listUsers();
   }, []);
 
@@ -62,12 +115,13 @@ function Hello() {
       return;
     }
     setCurrentUser(user);
-    console.log('selected', user);
     window.electron.ipcRenderer.setUser(user);
+
+    getLatestRecord(user.id);
   };
 
   if (!IsGetUser) {
-    return <div>Loading...</div>;
+    return null;
   }
 
   return (
@@ -91,9 +145,20 @@ function Hello() {
         <button
           type="button"
           className="Toggle"
-          onClick={() => setIsEnter(!isEnter)}
+          onClick={() => {
+            if (!currentUser) {
+              console.log('currentUser is null');
+              return;
+            }
+
+            if (currentRecord) {
+              exit();
+            } else {
+              enter();
+            }
+          }}
         >
-          {isEnter ? '退出' : '入室'}
+          {currentRecord ? '退出' : '入室'}
         </button>
       </div>
     </div>

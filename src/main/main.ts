@@ -115,14 +115,20 @@ const createWindow = async () => {
 
 const StoreData = new Store({ name: 'data' });
 
-// getUser(data取得処理)
 ipcMain.handle('getUser', async () => {
   return StoreData.get('User', []);
 });
 
-// getUser(data保存処理)
-ipcMain.handle('setU', async (event, data) => {
+ipcMain.handle('setUser', async (event, data) => {
   StoreData.set('User', data);
+});
+
+ipcMain.handle('getRecord', async () => {
+  return StoreData.get('Record', []);
+});
+
+ipcMain.handle('setRecord', async (event, data) => {
+  StoreData.set('Record', data);
 });
 
 /**

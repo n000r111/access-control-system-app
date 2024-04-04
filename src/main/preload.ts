@@ -23,6 +23,8 @@ const electronHandler = {
     },
     getUser: () => ipcRenderer.invoke('getUser'),
     setUser: (data: unknown) => ipcRenderer.invoke('setUser', data),
+    getRecord: () => ipcRenderer.invoke('getRecord'),
+    setRecord: (data: unknown) => ipcRenderer.invoke('setRecord', data),
   },
 };
 
