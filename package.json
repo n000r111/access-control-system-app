@@ -177,7 +177,7 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
+    "productName": "入退室管理",
     "appId": "org.erb.ElectronReact",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
@@ -255,5 +255,9 @@
       "src/main/**"
     ],
     "logLevel": "quiet"
+  },
+  "nsis":{
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true
   }
 }
