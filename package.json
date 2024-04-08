@@ -182,6 +182,7 @@
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
+      "assets",
       "dist",
       "node_modules",
       "package.json"
@@ -216,6 +217,7 @@
       ]
     },
     "win": {
+      "icon": "assets/icons/icon.ico",
       "target": [
         "nsis"
       ]
